@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
+/* ---------- design tokens ---------- */
 :root {
   --y: #FFF200;
   --bk: #000000;
@@ -18,6 +19,7 @@
   );
 }
 
+/* ---------- base ---------- */
 * {
   box-sizing: border-box;
 }
@@ -84,6 +86,7 @@ a {
   outline-offset: 2px;
 }
 
+/* ---------- utilities ---------- */
 .muted {
   color: var(--muted);
 }
@@ -132,6 +135,7 @@ a {
 
 /* Buttons */
 
+/* ---------- buttons ---------- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -194,6 +198,7 @@ a {
 
 /* Forms */
 
+/* ---------- forms ---------- */
 .field {
   display: flex;
   flex-direction: column;
@@ -274,6 +279,7 @@ select option {
 
 /* Alerts */
 
+/* ---------- alerts ---------- */
 .alert {
   border: 1.5px solid var(--y);
   border-radius: var(--radius);
@@ -301,6 +307,7 @@ select option {
 
 /* Badges */
 
+/* ---------- badges ---------- */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -335,6 +342,7 @@ select option {
 
 /* App shell */
 
+/* ---------- owner app layout ---------- */
 .shell {
   display: grid;
   grid-template-columns: 236px minmax(0, 1fr);
@@ -526,6 +534,7 @@ select option {
 
 /* Cards and tables */
 
+/* ---------- cards & tables ---------- */
 .card {
   border: 1.5px solid var(--line);
   border-radius: 8px;
@@ -736,6 +745,7 @@ td.actions {
 
 /* Customer spaces */
 
+/* ---------- storage spaces ---------- */
 .space-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -804,6 +814,7 @@ td.actions {
 
 /* Chart */
 
+/* ---------- reports chart ---------- */
 .chart {
   width: 100%;
 }
@@ -832,6 +843,7 @@ td.actions {
 
 /* Modal */
 
+/* ---------- modal ---------- */
 .overlay {
   position: fixed;
   inset: 0;
@@ -875,6 +887,7 @@ td.actions {
 
 /* Rental timeline */
 
+/* ---------- rental request timeline ---------- */
 .timeline {
   list-style: none;
   margin: 0;
@@ -1028,6 +1041,44 @@ td.actions {
   pointer-events: none;
 }
 
+/* ---------- CSV import ---------- */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.step {
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.step.done {
+  border-color: var(--y);
+  background: var(--tint);
+}
+
+.step.now {
+  border-color: var(--y);
+  border-style: dashed;
+}
+
+.dropzone {
+  border: 2px dashed var(--line-strong);
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+}
+
+.dropzone.has {
+  border-style: solid;
+  border-color: var(--y);
+  background: var(--tint);
+}
+
+/* ---------- loading ---------- */
 .spinner {
   width: 26px;
   height: 26px;
@@ -1053,6 +1104,7 @@ td.actions {
 
 /* Responsive */
 
+/* ---------- responsive ---------- */
 @media (max-width: 1080px) {
   .grid.c4 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1111,6 +1163,14 @@ td.actions {
   .auth-art {
     min-height: 300px;
     padding: 24px;
+  }
+
+  .user-chip .who {
+    display: none;
+  }
+}
+  .steps {
+    grid-template-columns: 1fr;
   }
 
   .user-chip .who {
