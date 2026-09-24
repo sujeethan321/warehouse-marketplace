@@ -1168,12 +1168,7 @@ td.actions {
   .user-chip .who {
     display: none;
   }
-}
   .steps {
     grid-template-columns: 1fr;
-  }
-
-  .user-chip .who {
-    display: none;
   }
 }
