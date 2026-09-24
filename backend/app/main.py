@@ -1,25 +1,28 @@
-# backend/app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, spaces, rentals, imports, reports
 
-app = FastAPI(title="Warehouse Marketplace API")
+from app.config import settings
+from app.routers import auth, imports, rentals, reports, spaces
 
-# Setup CORS so your React frontend can talk to this backend
+app = FastAPI(title="StoreShare - Shared Warehouse Capacity Marketplace", version="1.0.0")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Update with frontend domain in production
+    allow_origins=settings.cors_origin_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(auth.router)
+# imports must be registered before spaces so "/api/spaces/import" is never read as "/api/spaces/{id}"
+app.include_router(imports.router)
 app.include_router(spaces.router)
 app.include_router(rentals.router)
-app.include_router(imports.router)
+app.include_router(rentals.owner_router)
 app.include_router(reports.router)
 
+
 @app.get("/api/health")
-def health_check():
-    return {"status": "ok", "message": "Backend running on Vercel!"}
+def health():
+    return {"status": "ok"}

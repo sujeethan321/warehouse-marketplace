@@ -1,127 +1,78 @@
-# backend/app/routers/rentals.py
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import select
 from sqlalchemy.orm import Session
-from typing import List
-from decimal import Decimal
 
+from app.auth.security import get_current_user, require_customer, require_owner
 from app.database import get_db
-from app.models.rental import RentalRequest, RentalStatus, RentalStatusHistory
+from app.models.rental import RentalRequest
 from app.models.space import StorageSpace
-from app.models.user import User, UserRole
-from app.schemas.rental import RentalCreate, RentalResponse, RentalStatusUpdate
-from app.auth.security import get_current_user, require_role
+from app.models.user import ROLE_CUSTOMER, ROLE_OWNER, User
+from app.schemas.rental import RentalCreate, RentalOut, StatusUpdate
 from app.services.capacity import check_capacity
+from app.services.rental_service import change_status, create_rental, serialize_rental
 
-router = APIRouter(prefix="/api", tags=["Rentals"])
+router = APIRouter(prefix="/api/rentals", tags=["rentals"])
+owner_router = APIRouter(prefix="/api/owner", tags=["owner"])
 
-# Allowed state transition map strictly enforced
-VALID_TRANSITIONS = {
-    RentalStatus.pending: [RentalStatus.approved, RentalStatus.rejected, RentalStatus.cancelled],
-    RentalStatus.approved: [RentalStatus.cancelled],
-    RentalStatus.rejected: [],
-    RentalStatus.cancelled: []
-}
 
-@router.post("/rentals", response_model=RentalResponse, status_code=201)
-def create_rental_request(
-    rental_in: RentalCreate,
-    current_user: User = Depends(require_role(UserRole.customer)),
-    db: Session = Depends(get_db)
+@router.post("", response_model=RentalOut, status_code=201)
+def submit_request(payload: RentalCreate, user: User = Depends(require_customer), db: Session = Depends(get_db)):
+    return create_rental(db, user, payload)
+
+
+@router.get("/my", response_model=list[RentalOut])
+def my_rentals(
+    status: str | None = Query(None, pattern="^(pending|approved|rejected|cancelled)$"),
+    user: User = Depends(require_customer),
+    db: Session = Depends(get_db),
 ):
-    if rental_in.end_date <= rental_in.start_date:
-        raise HTTPException(status_code=400, detail="End date must be after start date")
-
-    space = db.query(StorageSpace).filter(StorageSpace.id == rental_in.space_id).first()
-    if not space:
-        raise HTTPException(status_code=404, detail="Space not found")
-
-    # Auto calculation of price based on duration in days
-    days = (rental_in.end_date - rental_in.start_date).days
-    total_price = Decimal(days) * Decimal(space.unit_price) * Decimal(rental_in.requested_capacity)
-
-    rental = RentalRequest(
-        customer_id=current_user.id,
-        space_id=rental_in.space_id,
-        requested_capacity=rental_in.requested_capacity,
-        start_date=rental_in.start_date,
-        end_date=rental_in.end_date,
-        status=RentalStatus.pending,
-        total_price=total_price
+    stmt = (
+        select(RentalRequest)
+        .where(RentalRequest.customer_id == user.id)
+        .order_by(RentalRequest.created_at.desc(), RentalRequest.id.desc())
     )
-    db.add(rental)
-    db.commit()
-    db.refresh(rental)
-    return rental
+    if status:
+        stmt = stmt.where(RentalRequest.status == status)
+    return [serialize_rental(r) for r in db.execute(stmt).scalars()]
 
-@router.get("/rentals/my", response_model=List[RentalResponse])
-def get_customer_rentals(
-    current_user: User = Depends(require_role(UserRole.customer)),
-    db: Session = Depends(get_db)
-):
-    return db.query(RentalRequest).filter(RentalRequest.customer_id == current_user.id).all()
 
-@router.get("/owner/rentals", response_model=List[RentalResponse])
-def get_owner_rental_requests(
-    current_user: User = Depends(require_role(UserRole.owner)),
-    db: Session = Depends(get_db)
-):
-    return db.query(RentalRequest).join(StorageSpace).filter(StorageSpace.owner_id == current_user.id).all()
-
-@router.patch("/rentals/{rental_id}/status", response_model=RentalResponse)
-def update_rental_status(
-    rental_id: int,
-    status_update: RentalStatusUpdate,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    # Transaction boundary
-    with db.begin_nested():
-        # SELECT ... FOR UPDATE to avoid approval race conditions on concurrent requests
-        rental = db.query(RentalRequest).filter(RentalRequest.id == rental_id).with_for_update().first()
-        if not rental:
-            raise HTTPException(status_code=404, detail="Rental request not found")
-
-        space = db.query(StorageSpace).filter(StorageSpace.id == rental.space_id).first()
-
-        # Authorization Checks
-        if current_user.role == UserRole.owner and space.owner_id != current_user.id:
-            raise HTTPException(status_code=403, detail="Not authorized to alter this rental request")
-        if current_user.role == UserRole.customer and rental.customer_id != current_user.id:
-            raise HTTPException(status_code=403, detail="Not authorized to alter this rental request")
-
-        new_status = status_update.status
-        old_status = rental.status
-
-        # Transition map enforcement
-        if new_status not in VALID_TRANSITIONS.get(old_status, []):
-            raise HTTPException(status_code=400, detail=f"Invalid transition from {old_status.value} to {new_status.value}")
-
-        # If transition is APPROVAL, re-verify capacity inside transaction
-        if new_status == RentalStatus.approved:
-            cap_check = check_capacity(
-                db,
-                space_id=rental.space_id,
-                start_date=rental.start_date,
-                end_date=rental.end_date,
-                requested_capacity=rental.requested_capacity,
-                exclude_rental_id=rental.id
-            )
-            if not cap_check["ok"]:
-                raise HTTPException(
-                    status_code=409,
-                    detail=f"Capacity overbooked. Available: {cap_check['total'] - cap_check['used']}, Requested: {rental.requested_capacity}"
-                )
-
-        # Update state and write audit trail
-        rental.status = new_status
-        history = RentalStatusHistory(
-            rental_id=rental.id,
-            old_status=old_status,
-            new_status=new_status,
-            changed_by=current_user.id
+@router.get("/{rental_id}", response_model=RentalOut)
+def get_rental(rental_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    rental = db.get(RentalRequest, rental_id)
+    if rental is None:
+        raise HTTPException(404, "Rental not found")
+    is_customer = user.role == ROLE_CUSTOMER and rental.customer_id == user.id
+    is_owner = user.role == ROLE_OWNER and rental.space.owner_id == user.id
+    if not (is_customer or is_owner):
+        raise HTTPException(403, "You cannot view this rental")
+    capacity = None
+    if is_owner:
+        capacity = check_capacity(
+            db, rental.space_id, rental.start_date, rental.end_date, rental.requested_capacity,
+            exclude_rental_id=rental.id,
         )
-        db.add(history)
+    return serialize_rental(rental, with_history=True, capacity=capacity)
 
-    db.commit()
-    db.refresh(rental)
-    return rental
+
+@router.patch("/{rental_id}/status", response_model=RentalOut)
+def update_status(
+    rental_id: int, payload: StatusUpdate, user: User = Depends(get_current_user), db: Session = Depends(get_db)
+):
+    return change_status(db, rental_id, payload.status, user)
+
+
+@owner_router.get("/rentals", response_model=list[RentalOut])
+def owner_rentals(
+    status: str | None = Query(None, pattern="^(pending|approved|rejected|cancelled)$"),
+    user: User = Depends(require_owner),
+    db: Session = Depends(get_db),
+):
+    stmt = (
+        select(RentalRequest)
+        .join(StorageSpace, StorageSpace.id == RentalRequest.space_id)
+        .where(StorageSpace.owner_id == user.id)
+        .order_by(RentalRequest.created_at.desc(), RentalRequest.id.desc())
+    )
+    if status:
+        stmt = stmt.where(RentalRequest.status == status)
+    return [serialize_rental(r) for r in db.execute(stmt).scalars()]

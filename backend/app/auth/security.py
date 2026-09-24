@@ -6,6 +6,7 @@ import bcrypt
 import jwt
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -13,9 +14,11 @@ from app.database import get_db
 from app.models.user import ROLE_CUSTOMER, ROLE_OWNER, User
 
 bearer_scheme = HTTPBearer(auto_error=False)
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 # ---------------- passwords ----------------
+
 
 def hash_password(password: str) -> str:
     if len(password.encode("utf-8")) > 72:
@@ -32,7 +35,9 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 # ---------------- JWT ----------------
 def create_access_token(user: User) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(
+        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+    )
     payload = {"sub": str(user.id), "role": user.role, "exp": expire}
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
@@ -49,7 +54,9 @@ def get_current_user(
     if creds is None:
         raise unauthorized
     try:
-        payload = jwt.decode(creds.credentials, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = jwt.decode(
+            creds.credentials, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
         user_id = int(payload["sub"])
     except (jwt.PyJWTError, KeyError, ValueError):
         raise unauthorized
@@ -65,7 +72,9 @@ def require_role(*roles: str):
 
     def checker(user: User = Depends(get_current_user)) -> User:
         if user.role not in roles:
-            raise HTTPException(status_code=403, detail="You do not have permission to do this.")
+            raise HTTPException(
+                status_code=403, detail="You do not have permission to do this."
+            )
         return user
 
     return checker
@@ -92,7 +101,10 @@ def rate_limit(name: str, limit: int, window_seconds: int):
         while q and now - q[0] > window_seconds:
             q.popleft()
         if len(q) >= limit:
-            raise HTTPException(status_code=429, detail="Too many attempts. Please wait a moment and try again.")
+            raise HTTPException(
+                status_code=429,
+                detail="Too many attempts. Please wait a moment and try again.",
+            )
         q.append(now)
 
     return dep

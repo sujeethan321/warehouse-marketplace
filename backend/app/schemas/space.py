@@ -55,9 +55,3 @@ class AvailabilityOut(BaseModel):
     used: float  # peak approved usage inside the window
     available: float
     timeline: list[TimelinePoint] | None = None
-
-
-# Backwards-compatible aliases used by the router layer.
-SpaceCreate = SpaceIn
-SpaceUpdate = SpaceIn
-SpaceResponse = SpaceOut

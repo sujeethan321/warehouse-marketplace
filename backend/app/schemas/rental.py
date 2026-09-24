@@ -58,8 +58,3 @@ class RentalOut(BaseModel):
     created_at: datetime | None = None
     history: list[HistoryOut] | None = None
     capacity: CapacityInfo | None = None
-
-
-# Backwards-compatible aliases used by the router layer.
-RentalStatusUpdate = StatusUpdate
-RentalResponse = RentalOut

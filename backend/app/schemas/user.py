@@ -38,9 +38,3 @@ class TokenOut(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserOut
-
-
-# Backwards-compatible aliases used by the auth router and frontend contracts.
-UserCreate = RegisterIn
-UserResponse = UserOut
-Token = TokenOut
