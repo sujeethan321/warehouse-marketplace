@@ -1,21 +1,46 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import Navbar from './components/Navbar'
+import Sidebar from './components/Sidebar'
 
-function App() {
+import AddSpace from './pages/owner/AddSpace'
+import CSVImport from './pages/owner/CSVImport'
+import EditSpace from './pages/owner/EditSpace'
+import MySpaces from './pages/owner/MySpaces'
+import OwnerDashboard from './pages/owner/OwnerDashboard'
+import RentalRequests from './pages/owner/RentalRequests'
+import Reports from './pages/owner/Reports'
+
+function AppLayout() {
   return (
-    <Router>
-      <div className="app-shell">
-        <h1>Warehouse Marketplace</h1>
-        <p>Frontend scaffold ready.</p>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<div>Login page placeholder</div>} />
-          <Route path="/register" element={<div>Register page placeholder</div>} />
-          <Route path="/owner" element={<div>Owner dashboard placeholder</div>} />
-          <Route path="/customer" element={<div>Customer dashboard placeholder</div>} />
-        </Routes>
+    <div className="shell">
+      <Sidebar />
+
+      <div className="main">
+        <Navbar />
+
+        <main className="page">
+          <Outlet />
+        </main>
       </div>
-    </Router>
+    </div>
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route path="/owner" element={<OwnerDashboard />} />
+        <Route path="/owner/spaces" element={<MySpaces />} />
+        <Route path="/owner/spaces/new" element={<AddSpace />} />
+        <Route path="/owner/spaces/:id/edit" element={<EditSpace />} />
+        <Route path="/owner/requests" element={<RentalRequests />} />
+        <Route path="/owner/import" element={<CSVImport />} />
+        <Route path="/owner/reports" element={<Reports />} />
+      </Route>
+
+      <Route path="/" element={<Navigate to="/owner" replace />} />
+      <Route path="*" element={<Navigate to="/owner" replace />} />
+    </Routes>
+  )
+}
