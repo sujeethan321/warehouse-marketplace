@@ -101,7 +101,7 @@
 
 // export const num = (n) => Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })
 
-// export function greeting() {
+//  export function greeting() {
 //   const h = new Date().getHours()
 //   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'
 // }
