@@ -2,7 +2,10 @@ import { useNavigate } from 'react-router-dom'
 import SpaceForm from '../../components/SpaceForm'
 import { createSpace } from '../../services/spaceService'
 
-export default function AddSpace() {
+const LIVE_API = { createSpace }
+
+export default function AddSpace({ api = LIVE_API, basePath = '/owner' }) {
+  const { createSpace } = api
   const navigate = useNavigate()
   return (
     <>
@@ -14,10 +17,10 @@ export default function AddSpace() {
       </div>
       <SpaceForm
         submitLabel="Publish listing"
-        onCancel={() => navigate('/owner/spaces')}
+        onCancel={() => navigate(`${basePath}/spaces`)}
         onSubmit={async (data) => {
           await createSpace(data)
-          navigate('/owner/spaces')
+          navigate(`${basePath}/spaces`)
         }}
       />
     </>

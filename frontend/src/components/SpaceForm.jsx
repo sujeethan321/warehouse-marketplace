@@ -1,3 +1,4 @@
+import WarehouseCover, { storedCover } from './WarehouseCover'
 import { useState } from 'react'
 import { Check, Circle } from 'lucide-react'
 import { errMsg } from '../services/api'
@@ -7,6 +8,8 @@ const EMPTY = { unique_code: '', name: '', total_capacity: '', unit: 'sq.ft', un
 // Shared by "Add space" and "Edit space"
 export default function SpaceForm({ initial, onSubmit, submitLabel, onCancel }) {
   const [f, setF] = useState({ ...EMPTY, ...(initial || {}) })
+  const [cover, setCover] = useState(storedCover(initial?.unique_code))
+  const [coverMessage, setCoverMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const set = (k) => (e) => setF((s) => ({ ...s, [k]: e.target.value }))
@@ -43,6 +46,28 @@ export default function SpaceForm({ initial, onSubmit, submitLabel, onCancel }) 
     <form onSubmit={submit} className="grid side">
       <div className="stack">
         {error && <div className="alert error">{error}</div>}
+        <div className="card stack">
+          <h2>Warehouse cover image</h2>
+          <p className="muted small">Browser-local preview only. Images are not uploaded or shared across devices.</p>
+          {cover ? <img className="warehouse-cover detail-cover" src={cover} alt="Selected warehouse cover" /> : <WarehouseCover space={initial || {}} />}
+          <div className="field"><label htmlFor="cover-image">Cover image · JPG, PNG or WebP · up to 2 MB</label>
+          <input id="cover-image" type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (!file) return
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024) { setCoverMessage('Choose a JPG, PNG or WebP image under 2 MB.'); return }
+            const reader = new FileReader()
+            reader.onload = () => { setCover(reader.result); setCoverMessage('Image selected. Save the preview below.') }
+            reader.onerror = () => setCoverMessage('Unable to read this image.')
+            reader.readAsDataURL(file)
+          }} /></div>
+          <div className="row wrap"><button type="button" className="btn ghost" disabled={!cover || !f.unique_code.trim()} onClick={() => {
+            try { localStorage.setItem(`warehouse-cover:${f.unique_code.trim()}`, cover); setCoverMessage('Preview saved for this warehouse code in this browser.') }
+            catch { setCoverMessage('Browser storage is unavailable or full. Try a smaller image.') }
+          }}>Save cover preview</button><button type="button" className="btn ghost" disabled={!cover} onClick={() => {
+            try { localStorage.removeItem(`warehouse-cover:${f.unique_code.trim()}`); setCover(''); setCoverMessage('Local preview removed.') } catch { setCoverMessage('Browser storage is unavailable.') }
+          }}>Remove preview</button></div>
+          <p className="muted small" role="status">{coverMessage || 'Enter the warehouse code before saving a preview.'}</p>
+        </div>
         <div className="card">
           <div className="card-head"><h2>Unit identification</h2></div>
           <div className="form-grid">

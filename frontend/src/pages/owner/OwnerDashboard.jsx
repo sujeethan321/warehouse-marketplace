@@ -1,3 +1,4 @@
+import QuickActions from '../../components/QuickActions'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ReportChart from '../../components/ReportChart'
@@ -30,19 +31,19 @@ export default function OwnerDashboard() {
   const nearlyFull = util.spaces.filter((s) => s.utilisation_pct >= 90)
   const offline = spaces.filter((s) => s.availability === 'unavailable')
   const alerts = [
-    ...(pending.length ? [{ level: 'Action', text: `${pending.length} rental ${pending.length === 1 ? 'request needs' : 'requests need'} your review`, to: '/owner/requests' }] : []),
-    ...nearlyFull.map((s) => ({ level: 'Watch', text: `${s.name} is ${s.utilisation_pct}% booked today`, to: '/owner/spaces' })),
-    ...offline.map((s) => ({ level: 'Info', text: `${s.name} is marked unavailable`, to: `/owner/spaces/${s.id}/edit` })),
+    ...(pending.length ? [{ level: 'Action', text: `${pending.length} rental ${pending.length === 1 ? 'request needs' : 'requests need'} your review`, to: `${basePath}/requests` }] : []),
+    ...nearlyFull.map((s) => ({ level: 'Watch', text: `${s.name} is ${s.utilisation_pct}% booked today`, to: `${basePath}/spaces` })),
+    ...offline.map((s) => ({ level: 'Info', text: `${s.name} is marked unavailable`, to: `${basePath}/spaces/${s.id}/edit` })),
   ]
 
   return (
     <>
       <div className="page-head">
         <div>
-          <div className="sub">Welcome back, {user.name.split(' ')[0]}</div>
-          <h1>Operations overview</h1>
+          {user?.name && <div className="sub">Welcome back, {user.name.split(' ')[0]}</div>}
+          <h1>Welcome, Owner!</h1><p className="muted" style={{ marginTop: 8 }}>Manage your spaces and track rental requests.</p>
         </div>
-        <Link to="/owner/spaces/new" className="btn">Add storage space</Link>
+        <Link to={`${basePath}/spaces/new`} className="btn">Add storage space</Link>
       </div>
 
       <div className="stack" style={{ gap: 20 }}>
@@ -52,6 +53,8 @@ export default function OwnerDashboard() {
           <StatCard label="Approved revenue" value={moneyShort(rev.totals.revenue)} note={`${money(rev.totals.pending_value)} pending`} />
           <StatCard label="Requests to review" value={pending.length} note="Pending your decision" />
         </div>
+
+        <QuickActions owner basePath={basePath} />
 
         <div className="grid c2">
           <div className="card">
@@ -84,7 +87,7 @@ export default function OwnerDashboard() {
         </div>
 
         <div className="card">
-          <div className="card-head"><h2>Recent activity</h2><Link to="/owner/requests" className="small">All requests</Link></div>
+          <div className="card-head"><h2>Recent activity</h2><Link to={`${basePath}/requests`} className="small">All requests</Link></div>
           {rentals.length === 0 ? (
             <div className="empty">No customer requests yet.</div>
           ) : (

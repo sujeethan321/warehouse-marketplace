@@ -4,7 +4,10 @@ import SpaceForm from '../../components/SpaceForm'
 import { errMsg } from '../../services/api'
 import { getSpace, updateSpace } from '../../services/spaceService'
 
-export default function EditSpace() {
+const LIVE_API = { getSpace, updateSpace }
+
+export default function EditSpace({ api = LIVE_API, basePath = '/owner' }) {
+  const { getSpace, updateSpace } = api
   const { id } = useParams()
   const navigate = useNavigate()
   const [space, setSpace] = useState(null)
@@ -12,7 +15,7 @@ export default function EditSpace() {
 
   useEffect(() => {
     getSpace(id).then(setSpace).catch((e) => setError(errMsg(e)))
-  }, [id])
+  }, [id, getSpace])
 
   if (error) return <div className="alert error">{error}</div>
   if (!space) return <div className="spinner" />
@@ -28,10 +31,10 @@ export default function EditSpace() {
       <SpaceForm
         initial={space}
         submitLabel="Save changes"
-        onCancel={() => navigate('/owner/spaces')}
+        onCancel={() => navigate(`${basePath}/spaces`)}
         onSubmit={async (data) => {
           await updateSpace(id, data)
-          navigate('/owner/spaces')
+          navigate(`${basePath}/spaces`)
         }}
       />
     </>
