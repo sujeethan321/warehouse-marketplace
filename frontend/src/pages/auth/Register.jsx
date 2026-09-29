@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
-import AuthArt from '../../components/AuthArt'
+import warehouseImage from '../../assets/login-warehouse.png'
 import { homePath, useAuth } from '../../context/AuthContext'
 import { errMsg } from '../../services/api'
 
@@ -33,14 +33,14 @@ export default function Register() {
   }
 
   return (
-    <div className="auth">
-      <AuthArt />
-      <section className="auth-form">
-        <form className="auth-card stack" onSubmit={submit}>
-          <div>
-            <h2>Create your workspace</h2>
-            <p className="muted">Tell us how you will use StoreShare.</p>
-          </div>
+    <div className="login-page registration-page">
+      <div className="login-photo"><img src={warehouseImage} alt="Warehouse aisle with storage racks and warm yellow lighting" /></div>
+      <section className="login-panel" aria-labelledby="register-title">
+        <form className="login-form registration-form" onSubmit={submit}>
+          <header className="login-heading">
+            <h1 id="register-title">Create your <span>workspace</span></h1>
+            <p>Tell us how you will use StoreShare.</p>
+          </header>
           {error && <div className="alert error" role="alert">{error}</div>}
           <div className="role-pick">
             <label>
@@ -71,8 +71,8 @@ export default function Register() {
             <input id="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} value={f.password} onChange={set('password')} required />
             <span className="hint">At least 8 characters.</span>
           </div>
-          <button className="btn block" disabled={busy}>{busy ? 'Creating...' : f.role === 'owner' ? 'Create owner account' : 'Create customer account'}</button>
-          <p className="muted small" style={{ textAlign: 'center' }}>
+          <button className="login-submit" disabled={busy}>{busy ? 'Creating...' : f.role === 'owner' ? 'Create owner account' : 'Create customer account'}</button>
+          <p className="login-register">
             Already registered? <Link to="/login">Sign in</Link>
           </p>
         </form>

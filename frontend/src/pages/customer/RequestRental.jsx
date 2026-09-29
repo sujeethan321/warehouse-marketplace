@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import WarehouseCover from '../../components/WarehouseCover'
 import { ArrowLeft } from 'lucide-react'
 import { errMsg } from '../../services/api'
 import { createRental } from '../../services/rentalService'
 import { getSpace } from '../../services/spaceService'
 import useAvailability from '../../utils/useAvailability'
-import { addDays, daysBetween, formatRange, money, num, today } from '../../utils/dateUtils'
+import { addDays, daysBetween, formatDate, money, num, today } from '../../utils/dateUtils'
 
 export default function RequestRental() {
   const { id } = useParams()
@@ -22,7 +23,7 @@ export default function RequestRental() {
     getSpace(id).then(setSpace).catch((e) => setError(errMsg(e)))
   }, [id])
 
-  const { data: avail, error: availError } = useAvailability(id, start, end)
+  const { data: avail, error: availError, loading: availabilityLoading } = useAvailability(id, start, end)
 
   if (!space) return error ? <div className="alert error">{error}</div> : <div className="spinner" />
 
@@ -46,11 +47,11 @@ export default function RequestRental() {
   }
 
   return (
-    <>
+    <div className="customer-ui">
       <div className="page-head">
         <div>
           <Link to={`/customer/spaces/${space.id}`} className="row small muted" style={{ marginBottom: 8, textDecoration: 'none' }}><ArrowLeft size={13} /> Back to space</Link>
-          <h1>Book storage capacity</h1>
+          <h1>Request Rental</h1>
           <div className="muted" style={{ marginTop: 6 }}>{space.name} | {space.location}</div>
         </div>
       </div>
@@ -96,10 +97,13 @@ export default function RequestRental() {
         </div>
 
         <div className="card">
-          <div className="card-head"><h2>Order summary</h2></div>
+          <div className="card-head"><h2>Rental Summary</h2></div>
+          <div className="summary-space"><WarehouseCover space={space} /><div><h3>{space.name}</h3><p className="muted small">{space.location}</p></div></div>
           <dl className="kv" style={{ gridTemplateColumns: '110px 1fr' }}>
             <dt>Space</dt><dd>{space.unique_code}</dd>
-            <dt>Dates</dt><dd>{days > 0 ? formatRange(start, end) : '-'}</dd>
+            <dt>Move in</dt><dd>{formatDate(start)}</dd>
+            <dt>Move out</dt><dd>{formatDate(end)}</dd>
+            <dt>Availability</dt><dd>{availabilityLoading ? 'Checking…' : availError ? 'Unable to check' : space.availability !== 'available' ? 'Unavailable' : avail ? (capNum > 0 ? (capNum <= avail.available ? 'Available' : 'Insufficient capacity') : `${num(avail.available)} ${space.unit} free`) : 'Select valid dates'}</dd>
             <dt>Duration</dt><dd>{days > 0 ? `${days} days` : '-'}</dd>
             <dt>Capacity</dt><dd>{capNum > 0 ? `${num(capNum)} ${space.unit}` : '-'}</dd>
             <dt>Rate</dt><dd>{money(space.unit_price)} / {space.unit} / day</dd>
@@ -109,10 +113,10 @@ export default function RequestRental() {
             <span>Estimated total</span>
             <b className="num" style={{ fontSize: 22 }}>{estimate ? money(estimate) : '-'}</b>
           </div>
-          <button className="btn block" disabled={!valid || busy}>{busy ? 'Sending...' : 'Confirm and request booking'}</button>
+          <button className="btn block" disabled={!valid || busy}>{busy ? 'Sending...' : 'Request Rental'}</button>
           <p className="muted small" style={{ marginTop: 10 }}>Nothing is charged online. The server recalculates the price and the owner approves the request.</p>
         </div>
       </form>
-    </>
+    </div>
   )
 }

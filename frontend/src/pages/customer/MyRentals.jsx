@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import WarehouseCover from '../../components/WarehouseCover'
 import Modal from '../../components/Modal'
 import RentalDetail from '../../components/RentalDetail'
 import StatusBadge from '../../components/StatusBadge'
@@ -44,11 +45,11 @@ export default function MyRentals() {
   )
 
   return (
-    <>
+    <div className="customer-ui">
       <div className="page-head">
         <div>
           <div className="sub">Bookings</div>
-          <h1>Rental history</h1>
+          <h1>My Rentals</h1><p className="muted" style={{ marginTop: 8 }}>View and manage your rental requests.</p>
         </div>
         <Link to="/customer/browse" className="btn">Find warehouses</Link>
       </div>
@@ -59,7 +60,7 @@ export default function MyRentals() {
       <div className="filters">
         <div className="tabs" role="tablist">
           {TABS.map(([v, label]) => (
-            <button key={v} className={tab === v ? 'on' : ''} onClick={() => setTab(v)}>{label}</button>
+            <button key={v} className={tab === v ? 'on' : ''} onClick={() => setTab(v)} role="tab" aria-selected={tab === v}>{label}<span className="tab-count">{rentals ? rentals.filter((r) => !v || r.status === v).length : '–'}</span></button>
           ))}
         </div>
         <div className="field search right">
@@ -76,30 +77,14 @@ export default function MyRentals() {
               {rentals.length ? 'Try another status or search.' : 'Find a warehouse and send your first request.'}
             </div>
           ) : (
-            <div className="table-wrap">
-              <table>
-                <thead>
-                  <tr><th>Booking</th><th>Space</th><th>Capacity</th><th>Dates</th><th>Total</th><th>Status</th><th /></tr>
-                </thead>
-                <tbody>
-                  {shown.map((r) => (
-                    <tr key={r.id}>
-                      <td className="num">BK-{r.id}</td>
-                      <td><b>{r.space_name}</b><div className="muted small">{r.space_location}</div></td>
-                      <td>{num(r.requested_capacity)} {r.unit}</td>
-                      <td>{formatRange(r.start_date, r.end_date)}<div className="muted small">{r.days} days</div></td>
-                      <td className="num">{money(r.total_price)}</td>
-                      <td><StatusBadge status={r.status} /></td>
-                      <td className="actions">
-                        <button className="btn ghost sm" onClick={() => setOpenId(r.id)}>View</button>{' '}
-                        {(r.status === 'pending' || r.status === 'approved') && (
-                          <button className="btn ghost sm" onClick={() => setCancelling(r)}>Cancel</button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="rental-list">
+              {shown.map((r) => (
+                <article className="rental-row" key={r.id}>
+                  <WarehouseCover space={{ name: r.space_name, unique_code: r.space_unique_code, cover_image_url: r.space_cover_image_url }} />
+                  <div className="rental-info"><h3>{r.space_name}</h3><p className="muted small">{r.space_location} · BK-{r.id}</p><p className="small">{formatRange(r.start_date, r.end_date)}</p><p className="muted small">{num(r.requested_capacity)} {r.unit} · {r.days} days</p></div>
+                  <div className="rental-actions"><StatusBadge status={r.status} /><b>{money(r.total_price)}</b><div className="rental-buttons"><button className="btn ghost sm" onClick={() => setOpenId(r.id)}>View Details</button>{(r.status === 'pending' || r.status === 'approved') && <button className="btn ghost sm" onClick={() => setCancelling(r)}>Cancel</button>}</div></div>
+                </article>
+              ))}
             </div>
           )}
         </div>
@@ -115,15 +100,15 @@ export default function MyRentals() {
           title="Cancel this rental?"
           onClose={() => setCancelling(null)}
           footer={
-            <>
+            <div className="customer-cancel-actions">
               <button className="btn ghost" onClick={() => setCancelling(null)}>Keep rental</button>
               <button className="btn" disabled={busy} onClick={confirmCancel}>{busy ? 'Cancelling...' : 'Cancel rental'}</button>
-            </>
+            </div>
           }
         >
           <p>BK-{cancelling.id} at <b>{cancelling.space_name}</b> ({formatRange(cancelling.start_date, cancelling.end_date)}) will be cancelled and the capacity released. This cannot be undone.</p>
         </Modal>
       )}
-    </>
+    </div>
   )
 }
