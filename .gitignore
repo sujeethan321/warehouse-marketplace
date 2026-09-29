@@ -1,0 +1,53 @@
+# Local environment settings and secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+
+# JavaScript dependencies and generated frontend output
+node_modules/
+dist/
+.vite/
+
+# Python virtual environments
+.venv*/
+venv/
+env/
+ENV/
+
+# Python bytecode and tool caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.tox/
+.nox/
+*.egg-info/
+
+# Test and coverage output
+coverage/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+playwright-report/
+test-results/
+
+# Runtime logs
+*.log
+
+# Local editor and operating system files
+.idea/
+.vscode/*.local.json
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# PowerShell cache generated in this workspace
+/Microsoft/Windows/PowerShell/

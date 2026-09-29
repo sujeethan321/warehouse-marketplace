@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Pencil, Trash2 } from 'lucide-react'
+import WarehouseCover from '../../components/WarehouseCover'
 import Modal from '../../components/Modal'
 import StatCard from '../../components/StatCard'
 import StatusBadge from '../../components/StatusBadge'
@@ -8,7 +9,10 @@ import { errMsg } from '../../services/api'
 import { deleteSpace, mySpaces, updateSpace } from '../../services/spaceService'
 import { money, num } from '../../utils/dateUtils'
 
-export default function MySpaces() {
+const LIVE_API = { deleteSpace, mySpaces, updateSpace }
+
+export default function MySpaces({ api = LIVE_API, basePath = '/owner' }) {
+  const { deleteSpace, mySpaces, updateSpace } = api
   const [spaces, setSpaces] = useState(null)
   const [error, setError] = useState('')
   const [q, setQ] = useState('')
@@ -18,7 +22,7 @@ export default function MySpaces() {
 
   const load = useCallback(() => {
     mySpaces().then(setSpaces).catch((e) => setError(errMsg(e)))
-  }, [])
+  }, [mySpaces])
   useEffect(load, [load])
 
   async function toggle(s) {
@@ -62,8 +66,8 @@ export default function MySpaces() {
           <h1>Storage spaces</h1>
         </div>
         <div className="row">
-          <Link to="/owner/import" className="btn ghost">Import CSV</Link>
-          <Link to="/owner/spaces/new" className="btn">Add space</Link>
+          <Link to={`${basePath}/import`} className="btn ghost">Import CSV</Link>
+          <Link to={`${basePath}/spaces/new`} className="btn">Add space</Link>
         </div>
       </div>
 
@@ -106,7 +110,7 @@ export default function MySpaces() {
                     {shown.map((s) => (
                       <tr key={s.id}>
                         <td className="num">{s.unique_code}</td>
-                        <td><b>{s.name}</b></td>
+                        <td><div className="summary-space"><WarehouseCover space={s} /><b>{s.name}</b></div></td>
                         <td>{s.location}</td>
                         <td>{num(s.total_capacity)} {s.unit}</td>
                         <td>{num(s.available_capacity)} {s.unit}</td>
@@ -114,7 +118,7 @@ export default function MySpaces() {
                         <td><StatusBadge status={s.availability} /></td>
                         <td className="actions">
                           <button className="btn ghost sm" onClick={() => toggle(s)}>{s.availability === 'available' ? 'Take offline' : 'Go live'}</button>{' '}
-                          <Link className="icon-btn" to={`/owner/spaces/${s.id}/edit`} aria-label={`Edit ${s.name}`}><Pencil size={14} /></Link>{' '}
+                          <Link className="icon-btn" to={`${basePath}/spaces/${s.id}/edit`} aria-label={`Edit ${s.name}`}><Pencil size={14} /></Link>{' '}
                           <button className="icon-btn" onClick={() => setDeleting(s)} aria-label={`Delete ${s.name}`}><Trash2 size={14} /></button>
                         </td>
                       </tr>
