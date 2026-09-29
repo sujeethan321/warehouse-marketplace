@@ -30,11 +30,11 @@ export default function BrowseSpaces() {
   const windowed = f.start && f.end && datesOk
 
   return (
-    <>
+    <div className="customer-ui">
       <div className="page-head">
         <div>
           <div className="sub">Marketplace</div>
-          <h1>Find warehouse capacity</h1>
+          <h1>Browse Warehouse Spaces</h1><p className="muted" style={{ marginTop: 8 }}>Find the perfect space for your business needs.</p>
         </div>
       </div>
 
@@ -68,7 +68,7 @@ export default function BrowseSpaces() {
       {spaces && (
         <>
           <p className="muted" style={{ marginBottom: 14 }}>
-            {spaces.length} {spaces.length === 1 ? 'space' : 'spaces'} found
+            <b className="results-count">{spaces.length} {spaces.length === 1 ? 'Space' : 'Spaces'} Found</b>
             {windowed ? ' with the free capacity shown for your dates' : ' - free capacity shown for today'}
           </p>
           {spaces.length === 0 ? (
@@ -98,6 +98,6 @@ export default function BrowseSpaces() {
           )}
         </>
       )}
-    </>
+    </div>
   )
 }
