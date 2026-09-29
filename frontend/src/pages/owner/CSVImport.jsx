@@ -16,7 +16,10 @@ const COLUMNS = [
   ['availability', "Either 'available' or 'unavailable'."],
 ]
 
-export default function CSVImport() {
+const LIVE_API = { importCSV }
+
+export default function CSVImport({ api = LIVE_API, basePath = '/owner' }) {
+  const { importCSV } = api
   const [file, setFile] = useState(null)
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
@@ -92,7 +95,7 @@ export default function CSVImport() {
               <StatCard hot label="Imported" value={result.valid} note={result.valid ? 'Now listed in your spaces' : 'Nothing was imported'} />
               <StatCard label="Skipped" value={result.invalid} note={result.invalid ? 'See the reasons below' : 'No problems found'} />
             </div>
-            {result.valid > 0 && <div className="alert ok">{result.valid} {result.valid === 1 ? 'space was' : 'spaces were'} added. <Link to="/owner/spaces">View my spaces</Link></div>}
+            {result.valid > 0 && <div className="alert ok">{result.valid} {result.valid === 1 ? 'space was' : 'spaces were'} added. <Link to={`${basePath}/spaces`}>View my spaces</Link></div>}
             {result.errors.length > 0 && (
               <div className="card">
                 <div className="card-head"><h2>Validation results</h2><span className="muted small">Fix these rows and upload them again</span></div>

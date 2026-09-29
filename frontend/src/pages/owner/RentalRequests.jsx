@@ -7,7 +7,10 @@ import { formatDate, formatRange, money, num } from '../../utils/dateUtils'
 
 const TABS = [['pending', 'Pending'], ['approved', 'Approved'], ['rejected', 'Rejected'], ['cancelled', 'Cancelled'], ['', 'All']]
 
-export default function RentalRequests() {
+const LIVE_API = { getRental, ownerRentals, setRentalStatus }
+
+export default function RentalRequests({ api = LIVE_API, basePath = '/owner' }) {
+  const { getRental, ownerRentals, setRentalStatus } = api
   const [tab, setTab] = useState('pending')
   const [list, setList] = useState(null)
   const [selId, setSelId] = useState(null)
@@ -21,13 +24,13 @@ export default function RentalRequests() {
       setList(d)
       setSelId((cur) => (d.some((r) => r.id === cur) ? cur : d[0]?.id ?? null))
     }).catch((e) => setError(errMsg(e)))
-  }, [tab])
+  }, [tab, ownerRentals])
   useEffect(loadList, [loadList])
 
   useEffect(() => {
     setDetail(null)
     if (selId) getRental(selId).then(setDetail).catch((e) => setError(errMsg(e)))
-  }, [selId])
+  }, [selId, getRental])
 
   async function act(status) {
     setBusy(status)

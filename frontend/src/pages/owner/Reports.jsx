@@ -7,14 +7,17 @@ import { occupancy, revenue, utilisation } from '../../services/reportService'
 import { mySpaces } from '../../services/spaceService'
 import { addDays, downloadCSV, formatDate, money, moneyShort, num, today } from '../../utils/dateUtils'
 
-export default function Reports() {
+const LIVE_API = { occupancy, revenue, utilisation, mySpaces }
+
+export default function Reports({ api = LIVE_API, basePath = '/owner' }) {
+  const { occupancy, revenue, utilisation, mySpaces } = api
   const [f, setF] = useState({ start: addDays(today(), -30), end: addDays(today(), 60), space_id: '', bucket: 'week', status: '' })
   const [spaces, setSpaces] = useState([])
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
   const set = (k) => (e) => setF((s) => ({ ...s, [k]: e.target.value }))
 
-  useEffect(() => { mySpaces().then(setSpaces).catch(() => {}) }, [])
+  useEffect(() => { mySpaces().then(setSpaces).catch(() => {}) }, [mySpaces])
 
   const rangeOk = f.start && f.end && f.end > f.start
 
@@ -32,7 +35,7 @@ export default function Reports() {
         .catch((e) => !stale && setError(errMsg(e)))
     }, 250)
     return () => { stale = true; clearTimeout(t) }
-  }, [f, rangeOk])
+  }, [f, rangeOk, utilisation, occupancy, revenue])
 
   function exportCSV() {
     const rows = [['Booking', 'Customer', 'Space', 'Capacity', 'Unit', 'Move in', 'Move out', 'Status', 'Total price']]
