@@ -1,3 +1,4 @@
+import QuickActions from '../../components/QuickActions'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Modal from '../../components/Modal'
@@ -8,7 +9,7 @@ import StatusBadge from '../../components/StatusBadge'
 import { useAuth } from '../../context/AuthContext'
 import { errMsg } from '../../services/api'
 import { myRentals } from '../../services/rentalService'
-import { formatRange, greeting, money, moneyShort, num, today } from '../../utils/dateUtils'
+import { formatRange, money, moneyShort, num, today } from '../../utils/dateUtils'
 
 export default function CustomerDashboard() {
   const { user } = useAuth()
@@ -27,11 +28,12 @@ export default function CustomerDashboard() {
   const pending = (rentals || []).filter((r) => r.status === 'pending')
 
   return (
-    <>
+    <div className="customer-ui">
       <div className="page-head">
         <div>
           <div className="sub">Customer workspace</div>
-          <h1>{greeting()}, {user.name.split(' ')[0]}</h1>
+          <h1>Welcome, {user.name.split(' ')[0]}!</h1>
+          <p className="muted" style={{ marginTop: 8 }}>Find and rent the perfect warehouse space for your business.</p>
         </div>
         <Link to="/customer/browse" className="btn">Find warehouses</Link>
       </div>
@@ -47,6 +49,8 @@ export default function CustomerDashboard() {
             <StatCard label="Capacity in use today" value={num(active.reduce((s, r) => s + r.requested_capacity, 0))} note="Across all spaces" />
             <StatCard label="Awaiting approval" value={pending.length} note="Pending owner review" />
           </div>
+
+          <QuickActions />
 
           <div className="card">
             <div className="card-head">
@@ -100,6 +104,6 @@ export default function CustomerDashboard() {
           <RentalDetail id={openId} />
         </Modal>
       )}
-    </>
+    </div>
   )
 }

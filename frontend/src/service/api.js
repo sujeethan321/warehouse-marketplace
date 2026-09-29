@@ -5,12 +5,6 @@ const api = axios.create({
 })
 
 export const TOKEN_KEY = 'storeshare_token'
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem(TOKEN_KEY)
-  if (token) config.headers.Authorization = 'Bearer ' + token
-  return config
-})
-
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY)

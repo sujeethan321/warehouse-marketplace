@@ -28,7 +28,7 @@ export default function Navbar() {
           <b>{user.name}</b>
           <span>{user.role === 'owner' ? 'Warehouse owner' : 'Customer'}</span>
         </div>
-        <div className="avatar">{initials}</div>
+        <div className={user.role === 'customer' ? 'avatar customer-avatar' : 'avatar'}>{user.role === 'customer' ? 'Customer' : initials}</div>
         <button
           className="icon-btn"
           title="Sign out"

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, MapPin } from 'lucide-react'
+import WarehouseCover from '../../components/WarehouseCover'
+import { ArrowLeft, MapPin, Video, Car, Clock, ShieldCheck } from 'lucide-react'
 import ReportChart from '../../components/ReportChart'
 import StatusBadge from '../../components/StatusBadge'
 import { errMsg } from '../../services/api'
@@ -34,7 +35,7 @@ export default function SpaceDetails() {
   const canBook = space.availability === 'available'
 
   return (
-    <>
+    <div className="customer-ui">
       <div className="page-head">
         <div>
           <Link to="/customer/browse" className="row small muted" style={{ marginBottom: 8, textDecoration: 'none' }}><ArrowLeft size={13} /> Back to results</Link>
@@ -46,6 +47,11 @@ export default function SpaceDetails() {
 
       <div className="grid side">
         <div className="stack">
+          <WarehouseCover space={space} className="detail-cover" />
+          <div className="amenities">{[
+            ['cctv', 'CCTV', Video], ['parking', 'Parking', Car], ['access_24_7', '24/7 Access', Clock], ['secure_storage', 'Secure Storage', ShieldCheck],
+          ].filter(([key, label]) => space[key] === true || space.amenities?.[key] === true || (Array.isArray(space.amenities) && (space.amenities.includes(label) || space.amenities.includes(key)))).map(([key, label, Icon]) => <div className="amenity" key={key}><Icon size={20} /><span>{label}</span></div>)}</div>
+          {space.description && <section className="card stack"><h2>Description</h2><p className="muted">{space.description}</p></section>}
           <div className="grid c3">
             <div className="stat"><div className="k">Total capacity</div><div className="v">{num(space.total_capacity)}</div><div className="n">{space.unit}</div></div>
             <div className="stat"><div className="k">Free today</div><div className="v">{num(space.available_capacity)}</div><div className="n">{space.unit}</div></div>
@@ -105,6 +111,6 @@ export default function SpaceDetails() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
