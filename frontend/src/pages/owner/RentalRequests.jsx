@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
 import { Check, X } from 'lucide-react'
 import StatusBadge from '../../components/StatusBadge'
@@ -11,7 +12,10 @@ const LIVE_API = { getRental, ownerRentals, setRentalStatus }
 
 export default function RentalRequests({ api = LIVE_API, basePath = '/owner' }) {
   const { getRental, ownerRentals, setRentalStatus } = api
+  const [searchParams] = useSearchParams()
+  const requestedId = Number(searchParams.get('request')) || null
   const [tab, setTab] = useState('pending')
+  useEffect(() => { if (requestedId) setTab('') }, [requestedId])
   const [list, setList] = useState(null)
   const [selId, setSelId] = useState(null)
   const [detail, setDetail] = useState(null)
@@ -22,9 +26,9 @@ export default function RentalRequests({ api = LIVE_API, basePath = '/owner' }) 
   const loadList = useCallback(() => {
     ownerRentals(tab).then((d) => {
       setList(d)
-      setSelId((cur) => (d.some((r) => r.id === cur) ? cur : d[0]?.id ?? null))
+      setSelId((cur) => (d.some((r) => r.id === requestedId) ? requestedId : d.some((r) => r.id === cur) ? cur : d[0]?.id ?? null))
     }).catch((e) => setError(errMsg(e)))
-  }, [tab, ownerRentals])
+  }, [tab, ownerRentals, requestedId])
   useEffect(loadList, [loadList])
 
   useEffect(() => {

@@ -1,3 +1,4 @@
+import NotificationBell from './NotificationBell'
 import { LogOut } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -22,6 +23,7 @@ export default function Navbar() {
         {trail.map((t, i) => (i === trail.length - 1 ? <b key={i}>{t}</b> : <span key={i}>{t} / </span>))}
       </div>
       <div className="user-chip right">
+        <NotificationBell key={user.role + ":" + user.id} user={user} />
         <div className="who">
           <b>{user.name}</b>
           <span>{user.role === 'owner' ? 'Warehouse owner' : 'Customer'}</span>
