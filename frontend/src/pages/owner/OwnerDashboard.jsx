@@ -11,7 +11,7 @@ import { revenue, utilisation } from '../../services/reportService'
 import { mySpaces } from '../../services/spaceService'
 import { addDays, formatRange, money, moneyShort, num, today } from '../../utils/dateUtils'
 
-export default function OwnerDashboard() {
+export default function OwnerDashboard({ basePath = '/owner' }) {
   const { user } = useAuth()
   const [data, setData] = useState(null)
   const [error, setError] = useState('')

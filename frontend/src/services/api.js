@@ -4,6 +4,13 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
 })
 
+export const TOKEN_KEY = 'storeshare_token'
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem(TOKEN_KEY)
+  if (token) config.headers.Authorization = 'Bearer ' + token
+  return config
+})
+
 export function errMsg(
   err,
   fallback = 'Something went wrong. Please try again.'
