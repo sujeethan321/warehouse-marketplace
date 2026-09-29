@@ -4,7 +4,7 @@ import { TOKEN_KEY } from '../services/api'
 
 const AuthContext = createContext(null)
 
-export const homePath = (role) => role === 'owner' ? '/owner' : '/customer'
+export const homePath = (role) => role === 'admin' ? '/admin' : role === 'owner' ? '/owner' : '/customer'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)

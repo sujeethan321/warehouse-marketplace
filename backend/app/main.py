@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import auth, imports, rentals, reports, spaces
+from app.routers import admin, auth, imports, rentals, reports, spaces
 
 app = FastAPI(title="StoreShare - Shared Warehouse Capacity Marketplace", version="1.0.0")
 
@@ -15,6 +15,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(admin.router)
 # imports must be registered before spaces so "/api/spaces/import" is never read as "/api/spaces/{id}"
 app.include_router(imports.router)
 app.include_router(spaces.router)

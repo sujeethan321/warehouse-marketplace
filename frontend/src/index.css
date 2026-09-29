@@ -1547,3 +1547,18 @@ td.actions {
 @media (max-width: 380px) {
   .registration-form .form-grid { grid-template-columns: 1fr; }
 }
+
+/* Admin workspace reuses the shared theme and responsive shell. */
+.admin-pager, .admin-profile { padding: 20px; }
+.admin-profile dl { display: grid; grid-template-columns: minmax(120px, 180px) minmax(0, 1fr); gap: 16px; margin: 0; }
+.admin-profile dt { color: var(--muted); }
+.admin-profile dd { margin: 0; overflow-wrap: anywhere; }
+.admin-search { display: grid; gap: 6px; flex: 1; min-width: 0; }
+.admin-filters { align-items: end; }
+.admin-filters > label { display: grid; gap: 6px; }
+.admin-search input { width: 100%; }
+@media (max-width: 600px) {
+  .admin-filters { align-items: stretch; flex-direction: column; }
+  .admin-profile dl { grid-template-columns: 1fr; gap: 6px; }
+  .admin-profile dd { margin-bottom: 12px; }
+}
