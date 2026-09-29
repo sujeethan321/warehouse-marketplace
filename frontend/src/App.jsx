@@ -1,12 +1,3 @@
-import CustomerDashboard from './pages/customer/CustomerDashboard'
-import BrowseSpaces from './pages/customer/BrowserSpaces'
-import MyRentals from './pages/customer/MyRentals'
-import RequestRental from './pages/customer/RequestRental'
-import SpaceDetails from './pages/customer/SpaceDetails'
-import ProtectedRoute from './components/ProtectedRoute'
-import { useAuth } from './context/AuthContext'
-import Login from './pages/auth/Login'
-import Register from './pages/auth/Register'
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -65,24 +56,6 @@ function Home() {
 export default function App() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route element={<AppLayout />}>
-        <Route element={<ProtectedRoute role="owner" />}>
-        <Route path="/owner" element={<OwnerDashboard />} />
-        <Route path="/owner/spaces" element={<MySpaces />} />
-        <Route path="/owner/spaces/new" element={<AddSpace />} />
-        <Route path="/owner/spaces/:id/edit" element={<EditSpace />} />
-        <Route path="/owner/requests" element={<RentalRequests />} />
-        <Route path="/owner/import" element={<CSVImport />} />
-        <Route path="/owner/reports" element={<Reports />} />
-        </Route>
-        <Route element={<ProtectedRoute role="customer" />}>
-          <Route path="/customer" element={<CustomerDashboard />} />
-          <Route path="/customer/browse" element={<BrowseSpaces />} />
-          <Route path="/customer/rentals" element={<MyRentals />} />
-          <Route path="/customer/request/:id" element={<RequestRental />} />
-          <Route path="/customer/spaces/:id" element={<SpaceDetails />} />
       <Route path="/" element={<Home />} />
 
       <Route path="/login" element={<Login />} />
