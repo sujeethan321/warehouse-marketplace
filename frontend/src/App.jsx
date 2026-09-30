@@ -3,6 +3,9 @@ import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import Sidebar from './components/Sidebar'
 import { homePath, useAuth } from './context/AuthContext'
+
+import { AdminOverview, AdminUsers, AdminUserDetail, AdminRentals, AdminRentalDetail } from './pages/admin/AdminDashboard'
+
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import BrowseSpaces from './pages/customer/BrowseSpaces'
@@ -22,6 +25,9 @@ import RentalRequests from './pages/owner/RentalRequests'
 import Reports from './pages/owner/Reports'
 
 function AppLayout() {
+  const { user, loading } = useAuth()
+  if (loading) return <div className="spinner" />
+  if (!user) return <Navigate to="/login" replace />
   return (
     <div className="shell">
       <Sidebar />
@@ -55,6 +61,16 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Home />} />
 
+      <Route element={<ProtectedRoute role="admin" />}>
+        <Route element={<AppLayout />}>
+          <Route path="/admin" element={<AdminOverview />} />
+          <Route path="/admin/customers" element={<AdminUsers key="customers" role="customer" />} />
+          <Route path="/admin/owners" element={<AdminUsers key="owners" role="owner" />} />
+          <Route path="/admin/users/:id" element={<AdminUserDetail />} />
+          <Route path="/admin/rentals" element={<AdminRentals />} />
+          <Route path="/admin/rentals/:id" element={<AdminRentalDetail />} />
+        </Route>
+      </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 

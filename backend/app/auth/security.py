@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import get_db
-from app.models.user import ROLE_CUSTOMER, ROLE_OWNER, User
+from app.models.user import ROLE_ADMIN, ROLE_CUSTOMER, ROLE_OWNER, User
 
 bearer_scheme = HTTPBearer(auto_error=False)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -58,7 +58,7 @@ def get_current_user(
             creds.credentials, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         user_id = int(payload["sub"])
-    except (jwt.PyJWTError, KeyError, ValueError):
+    except (jwt.PyJWTError, KeyError, ValueError, TypeError):
         raise unauthorized
     user = db.get(User, user_id)
     if user is None:
@@ -82,6 +82,7 @@ def require_role(*roles: str):
 
 require_owner = require_role(ROLE_OWNER)
 require_customer = require_role(ROLE_CUSTOMER)
+require_admin = require_role(ROLE_ADMIN)
 
 
 # ---------------- simple in-memory rate limiter ----------------

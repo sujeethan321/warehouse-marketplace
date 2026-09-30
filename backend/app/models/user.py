@@ -7,6 +7,7 @@ from app.database import Base
 
 ROLE_OWNER = "owner"
 ROLE_CUSTOMER = "customer"
+ROLE_ADMIN = "admin"
 
 
 class User(Base):
@@ -16,5 +17,5 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[str] = mapped_column(String(150), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[str] = mapped_column(String(20), nullable=False)  # 'owner' | 'customer'
+    role: Mapped[str] = mapped_column(String(20), nullable=False)  # owner | customer | admin
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

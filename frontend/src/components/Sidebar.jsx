@@ -2,6 +2,12 @@ import { BarChart3, ClipboardList, FileUp, LayoutDashboard, Search, Warehouse, B
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
+const ADMIN_NAV = [
+  { to: '/admin', label: 'Overview', icon: LayoutDashboard, end: true },
+  { to: '/admin/customers', label: 'Customers', icon: Search },
+  { to: '/admin/owners', label: 'Owners', icon: Warehouse },
+  { to: '/admin/rentals', label: 'Rental history', icon: ClipboardList },
+]
 const CUSTOMER_NAV = [
   { to: '/customer', label: 'Overview', icon: LayoutDashboard, end: true },
   { to: '/customer/browse', label: 'Find warehouses', icon: Search },
@@ -17,7 +23,7 @@ const OWNER_NAV = [
 
 export default function Sidebar() {
   const { user } = useAuth()
-  const items = user.role === 'owner' ? OWNER_NAV : CUSTOMER_NAV
+  const items = user.role === 'admin' ? ADMIN_NAV : user.role === 'owner' ? OWNER_NAV : CUSTOMER_NAV
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -28,7 +34,7 @@ export default function Sidebar() {
         </div>
       </div>
       <div className="hazard" />
-      <div className="workspace-pill">{user.role === 'owner' ? 'Warehouse owner workspace' : 'Customer workspace'}</div>
+      <div className="workspace-pill">{user.role === 'admin' ? 'Admin workspace' : user.role === 'owner' ? 'Warehouse owner workspace' : 'Customer workspace'}</div>
       <nav className="nav">
         {items.map(({ to, label, icon: Icon, end }) => (
           <NavLink key={to} to={to} end={end} className={({ isActive }) => (isActive ? 'active' : '')}>
@@ -39,7 +45,7 @@ export default function Sidebar() {
       <div className="sidebar-foot">
         <div className="help-box">
           <b>Need operational help?</b>
-          {user.role === 'owner'
+          {user.role === 'admin' ? 'Review marketplace accounts, storage spaces, and rental history.' : user.role === 'owner'
             ? 'Requests are re-checked against capacity when you approve them.'
             : 'Move-out day is not charged: a rental Oct 1 to Oct 15 is 14 days.'}
         </div>
