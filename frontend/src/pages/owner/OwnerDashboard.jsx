@@ -1,4 +1,3 @@
-import QuickActions from '../../components/QuickActions'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ReportChart from '../../components/ReportChart'
@@ -9,7 +8,8 @@ import { errMsg } from '../../services/api'
 import { ownerRentals } from '../../services/rentalService'
 import { revenue, utilisation } from '../../services/reportService'
 import { mySpaces } from '../../services/spaceService'
-import { addDays, formatRange, money, moneyShort, num, today } from '../../utils/dateUtils'
+import { addDays, formatRange, num, today } from '../../utils/dateUtils'
+import { money, moneyShort } from './ownerUtils'
 
 export default function OwnerDashboard({ basePath = '/owner' }) {
   const { user } = useAuth()
@@ -53,8 +53,6 @@ export default function OwnerDashboard({ basePath = '/owner' }) {
           <StatCard label="Approved revenue" value={moneyShort(rev.totals.revenue)} note={`${money(rev.totals.pending_value)} pending`} />
           <StatCard label="Requests to review" value={pending.length} note="Pending your decision" />
         </div>
-
-        <QuickActions owner basePath={basePath} />
 
         <div className="grid c2">
           <div className="card">

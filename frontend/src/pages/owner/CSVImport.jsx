@@ -3,15 +3,18 @@ import { Link } from 'react-router-dom'
 import { FileUp } from 'lucide-react'
 import StatCard from '../../components/StatCard'
 import { errMsg } from '../../services/api'
-import { importCSV, TEMPLATE_ROWS } from '../../services/importService'
+import { importCSV } from '../../services/importService'
 import { downloadCSV } from '../../utils/dateUtils'
+import { prepareOwnerCSV } from './ownerCSV'
+
+const TEMPLATE_ROWS = [['name', 'total_capacity', 'unit', 'unit_price', 'location', 'availability']]
 
 const COLUMNS = [
-  ['unique_code', 'Text, max 50. Must not already exist in the system or repeat in the file.'],
+  ['unique_code', 'Optional first column. Generated automatically when omitted or blank; supplied codes must be unique.'],
   ['name', 'Text, max 150.'],
   ['total_capacity', 'Number greater than 0.'],
   ['unit', 'Text, e.g. sq.ft or pallets.'],
-  ['unit_price', 'Number greater than 0 (price per unit per day).'],
+  ['unit_price', 'Number greater than 0 (Rs per unit per day).'],
   ['location', 'Text, e.g. Jaffna.'],
   ['availability', "Either 'available' or 'unavailable'."],
 ]
@@ -37,9 +40,11 @@ export default function CSVImport({ api = LIVE_API, basePath = '/owner' }) {
     setError('')
     setResult(null)
     try {
-      setResult(await importCSV(file))
+      const csv = prepareOwnerCSV(await file.text())
+      const prepared = new File([csv], file.name, { type: 'text/csv' })
+      setResult(await importCSV(prepared))
     } catch (e) {
-      setError(errMsg(e))
+      setError(errMsg(e, e.message || 'Unable to import this CSV file.'))
     }
     setBusy(false)
   }
@@ -115,7 +120,7 @@ export default function CSVImport({ api = LIVE_API, basePath = '/owner' }) {
         )}
 
         <div className="card">
-          <div className="card-head"><h2>Required columns</h2><span className="muted small">Header must match exactly, in this order</span></div>
+          <div className="card-head"><h2>CSV columns</h2><span className="muted small">Use the template order. Unique codes are generated automatically.</span></div>
           <div className="table-wrap">
             <table>
               <thead><tr><th>Column</th><th>Rule</th></tr></thead>

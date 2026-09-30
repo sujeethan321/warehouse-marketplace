@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext'
 const LABELS = {
   customer: 'Customer', owner: 'Owner', browse: 'Find warehouse capacity', spaces: 'Storage spaces',
   rentals: 'My rentals', request: 'Book storage capacity', requests: 'Rental requests', import: 'Import storage spaces',
-  reports: 'Reports & analytics', new: 'Add storage space', edit: 'Edit space',
+  orders: 'Orders', reports: 'Reports & analytics', new: 'Add storage space', edit: 'Edit space',
 }
 
 export default function Navbar() {

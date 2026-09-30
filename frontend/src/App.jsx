@@ -29,6 +29,7 @@ import MySpaces from './pages/owner/MySpaces'
 import OwnerDashboard from './pages/owner/OwnerDashboard'
 import RentalRequests from './pages/owner/RentalRequests'
 import Reports from './pages/owner/Reports'
+import Orders from './pages/owner/Orders'
 
 function AppLayout() {
   const { user, loading } = useAuth()
@@ -128,6 +129,7 @@ export default function App() {
           <Route path="/owner/spaces/new" element={<AddSpace />} />
           <Route path="/owner/spaces/:id/edit" element={<EditSpace />} />
           <Route path="/owner/requests" element={<RentalRequests />} />
+          <Route path="/owner/orders" element={<Orders />} />
           <Route path="/owner/import" element={<CSVImport />} />
           <Route path="/owner/reports" element={<Reports />} />
         </Route>

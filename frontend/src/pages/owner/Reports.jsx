@@ -5,7 +5,8 @@ import StatusBadge from '../../components/StatusBadge'
 import { errMsg } from '../../services/api'
 import { occupancy, revenue, utilisation } from '../../services/reportService'
 import { mySpaces } from '../../services/spaceService'
-import { addDays, downloadCSV, formatDate, money, moneyShort, num, today } from '../../utils/dateUtils'
+import { addDays, downloadCSV, formatDate, num, today } from '../../utils/dateUtils'
+import { money, moneyShort } from './ownerUtils'
 
 const LIVE_API = { occupancy, revenue, utilisation, mySpaces }
 
@@ -38,7 +39,7 @@ export default function Reports({ api = LIVE_API, basePath = '/owner' }) {
   }, [f, rangeOk, utilisation, occupancy, revenue])
 
   function exportCSV() {
-    const rows = [['Booking', 'Customer', 'Space', 'Capacity', 'Unit', 'Move in', 'Move out', 'Status', 'Total price']]
+    const rows = [['Booking', 'Customer', 'Space', 'Capacity', 'Unit', 'Move in', 'Move out', 'Status', 'Total price (Rs)']]
     data.rev.rows.forEach((r) => rows.push([`BK-${r.rental_id}`, r.customer_name, r.space_name, r.requested_capacity, r.unit, r.start_date, r.end_date, r.status, r.total_price]))
     downloadCSV(`revenue-${f.start}-to-${f.end}.csv`, rows)
   }

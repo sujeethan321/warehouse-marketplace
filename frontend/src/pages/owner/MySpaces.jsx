@@ -7,7 +7,8 @@ import StatCard from '../../components/StatCard'
 import StatusBadge from '../../components/StatusBadge'
 import { errMsg } from '../../services/api'
 import { deleteSpace, mySpaces, updateSpace } from '../../services/spaceService'
-import { money, num } from '../../utils/dateUtils'
+import { num } from '../../utils/dateUtils'
+import { money } from './ownerUtils'
 
 const LIVE_API = { deleteSpace, mySpaces, updateSpace }
 
