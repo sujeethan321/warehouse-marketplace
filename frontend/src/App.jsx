@@ -10,6 +10,7 @@ import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import BrowseSpaces from './pages/customer/BrowseSpaces'
 import CustomerDashboard from './pages/customer/CustomerDashboard'
+import Payment from './pages/customer/Payment'
 import MyRentals from './pages/customer/MyRentals'
 import RequestRental from './pages/customer/RequestRental'
 import SpaceDetails from './pages/customer/SpaceDetails'
@@ -99,6 +100,7 @@ export default function App() {
             path="/customer/rentals"
             element={<MyRentals />}
           />
+          <Route path="/customer/rentals/:id/payment" element={<Payment />} />
         </Route>
       </Route>
 

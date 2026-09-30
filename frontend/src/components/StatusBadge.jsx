@@ -1,7 +1,6 @@
-// Statuses are told apart by shape (solid / dashed / struck-through), not by extra colours.
 const MAP = {
-  approved: { cls: 'solid', label: 'Approved' },
-  pending: { cls: 'dashed', label: 'Pending' },
+  approved: { cls: 'approved', label: 'Approved' },
+  pending: { cls: 'dashed', label: 'Pending review' },
   rejected: { cls: 'strike', label: 'Rejected' },
   cancelled: { cls: 'dim', label: 'Cancelled' },
   available: { cls: 'solid', label: 'Available' },

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import * as authService from '../services/authService'
 import { TOKEN_KEY } from '../services/api'
 
-const AuthContext = createContext(null)
+export const AuthContext = createContext(null)
 
 export const homePath = (role) => role === 'admin' ? '/admin' : role === 'owner' ? '/owner' : '/customer'
 

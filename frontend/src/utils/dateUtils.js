@@ -1,6 +1,6 @@
 // Date convention used everywhere in the app (same as the API and the database):
 //   start date = inclusive (move-in day)      end date = EXCLUSIVE (move-out day, not charged)
-export const CURRENCY = '$' // change this one line to switch currency symbol (e.g. 'Rs.')
+export const CURRENCY = 'Rs.' // change this one line to switch currency symbol (e.g. 'Rs.')
 
 const pad = (n) => String(n).padStart(2, '0')
 
