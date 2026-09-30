@@ -81,7 +81,7 @@ export default function MyRentals() {
               {shown.map((r) => (
                 <article className="rental-row" key={r.id}>
                   <WarehouseCover space={{ name: r.space_name, unique_code: r.space_unique_code, cover_image_url: r.space_cover_image_url }} />
-                  <div className="rental-info"><h3>{r.space_name}</h3><p className="muted small">{r.space_location} · BK-{r.id}</p><p className="small">{formatRange(r.start_date, r.end_date)}</p><p className="muted small">{num(r.requested_capacity)} {r.unit} · {r.days} days</p></div>
+                  <div className="rental-info"><h3>{r.space_name}</h3><p className="muted small">{r.space_location} · BK-{r.id}</p><p className="small">{formatRange(r.start_date, r.end_date)}</p><p className="muted small">{num(r.requested_capacity)} {r.unit} · {r.days} days</p>{r.status === 'approved' && <Link className="btn sm proceed-payment" to={`/customer/rentals/${r.id}/payment`}>Proceed to Payment</Link>}</div>
                   <div className="rental-actions"><StatusBadge status={r.status} /><b>{money(r.total_price)}</b><div className="rental-buttons"><button className="btn ghost sm" onClick={() => setOpenId(r.id)}>View Details</button>{(r.status === 'pending' || r.status === 'approved') && <button className="btn ghost sm" onClick={() => setCancelling(r)}>Cancel</button>}</div></div>
                 </article>
               ))}

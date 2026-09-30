@@ -1,14 +1,12 @@
 import { CalendarDays } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import StatusBadge from './StatusBadge'
 import { formatRange, money, num } from '../utils/dateUtils'
 
 export default function RentalCard({ rental, onClick }) {
   return (
-    <button
-      onClick={onClick}
-      style={{ all: 'unset', cursor: onClick ? 'pointer' : 'default', display: 'block' }}
-    >
-      <div className="card" style={{ height: '100%' }}>
+    <article className="card rental-summary">
+      <button type="button" className="rental-summary-details" onClick={onClick} aria-label={`View details for booking BK-${rental.id}`}>
         <div className="row spread" style={{ marginBottom: 8 }}>
           <h3>{rental.space_name}</h3>
           <StatusBadge status={rental.status} />
@@ -21,7 +19,8 @@ export default function RentalCard({ rental, onClick }) {
           <span className="small">{num(rental.requested_capacity)} {rental.unit}</span>
           <b className="num">{money(rental.total_price)}</b>
         </div>
-      </div>
-    </button>
+      </button>
+      {rental.status === 'approved' && <Link className="btn sm proceed-payment" to={`/customer/rentals/${rental.id}/payment`}>Proceed to Payment</Link>}
+    </article>
   )
 }
