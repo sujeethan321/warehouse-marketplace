@@ -30,6 +30,7 @@ export default function EditSpace({ api = LIVE_API, basePath = '/owner' }) {
       </div>
       <SpaceForm
         initial={space}
+        currencyLabel="Rs"
         submitLabel="Save changes"
         onCancel={() => navigate(`${basePath}/spaces`)}
         onSubmit={async (data) => {

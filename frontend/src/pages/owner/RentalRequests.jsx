@@ -4,7 +4,8 @@ import { Check, X } from 'lucide-react'
 import StatusBadge from '../../components/StatusBadge'
 import { errMsg } from '../../services/api'
 import { getRental, ownerRentals, setRentalStatus } from '../../services/rentalService'
-import { formatDate, formatRange, money, num } from '../../utils/dateUtils'
+import { formatDate, formatRange, num } from '../../utils/dateUtils'
+import { money } from './ownerUtils'
 
 const TABS = [['pending', 'Pending'], ['approved', 'Approved'], ['rejected', 'Rejected'], ['cancelled', 'Cancelled'], ['', 'All']]
 

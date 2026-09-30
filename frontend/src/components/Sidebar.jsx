@@ -17,6 +17,7 @@ const OWNER_NAV = [
   { to: '/owner', label: 'Overview', icon: LayoutDashboard, end: true },
   { to: '/owner/spaces', label: 'Storage spaces', icon: Warehouse },
   { to: '/owner/requests', label: 'Rental requests', icon: ClipboardList },
+  { to: '/owner/orders', label: 'Orders', icon: ClipboardList },
   { to: '/owner/import', label: 'CSV import', icon: FileUp },
   { to: '/owner/reports', label: 'Reports & analytics', icon: BarChart3 },
 ]

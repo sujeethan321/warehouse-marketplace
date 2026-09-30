@@ -6,7 +6,7 @@ import { errMsg } from '../services/api'
 const EMPTY = { unique_code: '', name: '', total_capacity: '', unit: 'sq.ft', unit_price: '', location: '', availability: 'available' }
 
 // Shared by "Add space" and "Edit space"
-export default function SpaceForm({ initial, onSubmit, submitLabel, onCancel }) {
+export default function SpaceForm({ initial, onSubmit, submitLabel, onCancel, generatedCode = false, currencyLabel = '' }) {
   const [f, setF] = useState({ ...EMPTY, ...(initial || {}) })
   const [cover, setCover] = useState(storedCover(initial?.unique_code))
   const [coverMessage, setCoverMessage] = useState('')
@@ -73,8 +73,8 @@ export default function SpaceForm({ initial, onSubmit, submitLabel, onCancel }) 
           <div className="form-grid">
             <div className="field">
               <label htmlFor="code">Unique code</label>
-              <input id="code" value={f.unique_code} onChange={set('unique_code')} placeholder="WH-001" maxLength={50} required />
-              <span className="hint">Must be unique across the marketplace.</span>
+              <input id="code" readOnly={generatedCode} value={f.unique_code} onChange={set('unique_code')} placeholder="WH-001" maxLength={50} required />
+              <span className="hint">{generatedCode ? 'Automatically generated for this new storage space.' : 'Must be unique across the marketplace.'}</span>
             </div>
             <div className="field">
               <label htmlFor="name">Space name</label>
@@ -99,7 +99,7 @@ export default function SpaceForm({ initial, onSubmit, submitLabel, onCancel }) 
               <input id="unit" value={f.unit} onChange={set('unit')} placeholder="sq.ft, pallets, m3" maxLength={50} required />
             </div>
             <div className="field">
-              <label htmlFor="price">Price per unit per day</label>
+              <label htmlFor="price">Price per unit per day{currencyLabel && ` (${currencyLabel})`}</label>
               <input id="price" type="number" min="0.01" step="0.01" value={f.unit_price} onChange={set('unit_price')} placeholder="150" required />
             </div>
             <div className="field">
