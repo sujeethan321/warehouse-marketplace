@@ -23,7 +23,7 @@ export default function Orders() {
     return () => { active = false }
   }, [attempt])
 
-  const visible = orders?.filter((order) => !status || order.status === status)
+  const visible = orders?.filter((order) => order.status !== 'rejected' && (!status || order.status === status))
 
   return (
     <>
@@ -35,7 +35,6 @@ export default function Orders() {
             <option value="">All bookings</option>
             <option value="approved">Approved</option>
             <option value="pending">Pending</option>
-            <option value="rejected">Rejected</option>
             <option value="cancelled">Cancelled</option>
           </select>
         </div>
